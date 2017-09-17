@@ -50,23 +50,33 @@ class Snake(object):
         this.pos = (this.size,this.size,this.size,this.size)
         this.parts = parts
         this.screen = screen
-        this.lastDirX = 0
+        this.lastDirX = 1
         this.lastDirY = 0
+        this.dirX = 1
+        this.dirY = 0
         this.speed = 0.1
+        this.posArray = [array('f'), array('f'), array('i'), array('i')]
+        this.posArray[0].append(0)
+        this.posArray[1].append(0)
+        this.posArray[2].append(1)
+        this.posArray[3].append(0)
         this.snakeHead = SnakeHead(this)
         this.snakeBody = [SnakeBody(this.snakeHead, i) for i in range(this.parts)]
-        this.posArray = [array('f'), array('f')]
     def Update(this, dirX, dirY):
-        if (dirX == 0 and this.lastDirX != 0):
-            this.posArray[0].append(this.snakeHead.pos[0])
-            this.posArray[1].append(this.snakeHead.pos[1])
-        elif (dirY == 0 and this.lastDirY != 0):
-            this.posArray[0].append(this.snakeHead.pos[0])
-            this.posArray[1].append(this.snakeHead.pos[1])
+        this.posArray[0].append(this.snakeHead.pos[0])
+        this.posArray[1].append(this.snakeHead.pos[1])
+        this.posArray[2].append(dirX)
+        this.posArray[3].append(dirY)
+
         this.lastDirX = dirX
         this.lastDirY = dirY
+        this.dirX = dirX
+        this.dirY = dirY
+
 
         this.snakeHead.Update(dirX,dirY)
+        for i in range (this.parts):
+            this.snakeBody[i].Update(this)
 
 class SnakeHead(object):
     def __init__(this, snake):
@@ -88,4 +98,17 @@ class SnakeBody(object):
         this.color = snake.color
         this.size = snake.size
         this.part = i
+        this.screen = snake.screen
         this.pos = (snake.pos[0]-this.part*(this.size+10),snake.pos[1],this.size,this.size)
+        this.dirX = 0
+        this.dirY = 0
+        this.font = pygame.font.Font(None, 20)
+
+    def Update(this, snake):
+        if ((this.pos[0] > snake.posArray[0][0]-1 and this.pos[0] < snake.posArray[0][0] + 1) and (this.pos[1] > snake.posArray[1][0] -1 and this.pos[1] < snake.posArray[1][0]-1)):
+            snake.posArray[0].pop([0])
+            snake.posArray[1].pop([0])
+            snake.posArray[2].pop([0])
+            snake.posArray[3].pop([0])
+        this.pos = (this.pos[0]+(snake.speed*snake.posArray[2][0]),this.pos[1]+(snake.speed*snake.posArray[3][0]),this.size,this.size)
+        pygame.draw.rect(this.screen, this.color, this.pos)

@@ -7,7 +7,7 @@ class EventHandler():
     """Handles input from user"""
     def __init__(this):
         this.mouseDown = False
-        this.xDirection = 0
+        this.xDirection = 1
         this.yDirection = 0
     def Update(this):
        this.mouseDown = False
