@@ -14,4 +14,4 @@ class Display(object):
     def Update(this): #Renders objects to the screen
         this.levels.Update()
         pygame.display.update()
-        this.screen.fill(color.BLACK)
+        this.screen.fill(colors.BLACK)

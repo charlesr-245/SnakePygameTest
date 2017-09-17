@@ -3,6 +3,7 @@ from pygame.locals import *
 import colors
 from LevelObjects import *
 from EventHandler import *
+import random
 
 class Levels(object):
     """All levels in the game"""
@@ -11,19 +12,35 @@ class Levels(object):
         this.DISPLAYWIDTH = this.screen.get_width()
         this.DISPLAYHEIGHT = this.screen.get_height()
         this.eventHandler = _eventHandler
-        this.levelObjects = LevelObjects(this.screen, this.eventHandler)
         pygame.font.init()
         this.TITLEFONT = pygame.font.Font(None,80)
         this.BUTTONFONT = pygame.font.Font(None,65)
+        this.ID = random.random()
 
-    def MainMenu(this):
+    def MainMenu(this,manager):
+        #print(this.ID)
         #Header
-        rect = pygame.draw.rect(this.screen, color.WHITE, (0,0,this.DISPLAYWIDTH,this.DISPLAYHEIGHT*0.1),0)
-        title = this.TITLEFONT.render("Snake", 1, color.BLACK,None)
+        rect = pygame.draw.rect(this.screen, colors.WHITE, (0,0,this.DISPLAYWIDTH,this.DISPLAYHEIGHT*0.1),0)
+        title = this.TITLEFONT.render("Snake", 1, colors.BLACK,None)
         titleInfo = title.get_rect()
         this.screen.blit(title, (this.DISPLAYWIDTH/2 - titleInfo.center[0],this.DISPLAYHEIGHT*0.01))
         #Buttons
-        playButton = this.levelObjects.Button(color.RED, ((this.DISPLAYWIDTH/2)-100,(this.DISPLAYHEIGHT/2),200,(60)),0, "Play", color.BLACK, this.BUTTONFONT, None)
-        playButtonDetector = this.levelObjects.Boundaries((this.DISPLAYWIDTH/2)-100,(this.DISPLAYHEIGHT/2),200,(60))
+        playButton = Button(colors.RED, ((this.DISPLAYWIDTH/2)-100,(this.DISPLAYHEIGHT/2),200,(60)),0, "Play", colors.BLACK, this.BUTTONFONT, this.screen, this.eventHandler,"l 1") #if the button is press the command "l 1" will be called with l standing for level and 1 being the level number
+        if (playButton.Boundaries(playButton.
+                                  size)):
+            manager.currentLevel = 1
+
+class Level1(object):
+    def __init__(this, screen, eventManager, enabled):
+        this.ID = random.random()
+        this.screen = screen
+        this.eventHandler = eventManager
+        this.snake = Snake(colors.GREEN, 15, 5, this.screen)
+        #print(this.snake.snakeHead.pos)
+    def Update(this):
+        #print(this.ID)
+        dirX = this.eventHandler.getXDirection()
+        dirY = this.eventHandler.getYDirection()
+        this.snake.Update(dirX, dirY)
 
 
