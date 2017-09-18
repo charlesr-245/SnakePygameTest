@@ -47,7 +47,7 @@ class Button(object):
         return False
 
 class Snake(object):
-    def __init__(this, color, size, parts, screen, manager):
+    def __init__(this, color, size, parts, screen, manager, collectable):
         this.manager = manager
         this.color = color
         this.size = size
@@ -58,9 +58,10 @@ class Snake(object):
         this.lastDirY = 0
         this.dirX = 1
         this.dirY = 0
-        this.speed = 0.1
+        this.speed = 0.5
         this.posToAppend = this.pos
         this.snakeHead = SnakeHead(this)
+        this.collectable = collectable
         this.posArray = [array('f'), array('f'), array('f'), array('f')] #Deprecated, used for pos display
         #this.snakeBody = [SnakeBody(this, i) for i in range(1, this.parts)]
         this.snakeBody = [SnakeBody(this,i) for i in range(1, this.parts)]
@@ -85,10 +86,20 @@ class Snake(object):
             pos = str(this.posArray[0][0]) + " , " + str(this.posArray[1][0]) + " , " + str(this.posArray[2][0]) + " , " + str(this.posArray[3][0]) 
             text = this.font.render(pos,1, colors.ORANGE)
             this.screen.blit(text, (200,100,0,0))'''
-
         this.snakeHead.Update(dirX,dirY)
         for i in range (1, this.parts-1):
             this.snakeBody[i].Update(this)
+        this.CheckCollectable()
+
+    def AddPart(this):
+        this.parts+=1
+        this.snakeBody.append(SnakeBody(this,this.parts))
+        this.collectable.ResetPos(this.collectable)
+
+    def CheckCollectable(this):
+        if (this.snakeHead.pos[0]>= this.collectable.pos[0] - this.collectable.size and this.snakeHead.pos[0]<= this.collectable.pos[0] + this.collectable.size):
+            if (this.snakeHead.pos[1]>= this.collectable.pos[1] - this.collectable.size and this.snakeHead.pos[1]<= this.collectable.pos[1] + this.collectable.size):
+                this.AddPart()
 
     def ResetPositions(this):
         this.pos = (this.size,this.size,this.size)
@@ -133,11 +144,16 @@ class SnakeBody(object):
         this.dirX = snake.dirX
         this.dirY = snake.dirY
         this.speed = snake.speed
-        this.pos = (snake.pos[0]-((i-1)*(this.size+5)),snake.pos[1],this.size,this.size)
+        if (snake.snakeHead.dirX != 0):
+             this.pos = (snake.snakeHead.pos[0]-((i-1)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
+        else:
+             this.pos = (snake.snakeHead.pos[0],snake.snakeHead.pos[1]-((i-1)*(this.size+5)*snake.snakeHead.dirY),this.size,this.size)
         this.font = pygame.font.Font(None,50)
         this.posArray = [array('f'), array('f'), array('f'), array('f')]
+        if (i > 5):
+            this.posArray = snake.snakeBody[i-1].posArray
         this.manager = snake.manager
-        print(this.part)
+        #print(this.part)
     def Update(this, snake):
         #snake.snakeBody.append(SnakeBody(this,8))
         if (len(this.posArray[0]) != 0):
@@ -191,6 +207,9 @@ class Collectable(object):
     def __init__(this, screen):
         this.size = 10
         this.screen = screen
-        this.pos = (random.randint(0,800), random.randint(0,600),this.size,this.size)
+        this.pos = (random.randint(0,780), random.randint(0,580),this.size,this.size)
+        #this.pos = (40,40,this.size,this.size)
     def Update(this):
         pygame.draw.rect(this.screen,colors.YELLOW,this.pos)
+    def ResetPos(snake, collectable):
+        collectable.pos = (random.randint(0,780), random.randint(0,580),collectable.size,collectable.size)
