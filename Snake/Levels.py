@@ -26,16 +26,16 @@ class Levels(object):
         this.screen.blit(title, (this.DISPLAYWIDTH/2 - titleInfo.center[0],this.DISPLAYHEIGHT*0.01))
         #Buttons
         playButton = Button(colors.RED, ((this.DISPLAYWIDTH/2)-100,(this.DISPLAYHEIGHT/2),200,(60)),0, "Play", colors.BLACK, this.BUTTONFONT, this.screen, this.eventHandler,"l 1") #if the button is press the command "l 1" will be called with l standing for level and 1 being the level number
-        if (playButton.Boundaries(playButton.
-                                  size)):
+        if (playButton.Boundaries(playButton.size)):
             manager.currentLevel = 1
 
 class Level1(object):
-    def __init__(this, screen, eventManager, enabled):
+    def __init__(this, screen, eventManager, enabled, manager):
         this.ID = random.random()
         this.screen = screen
         this.eventHandler = eventManager
-        this.snake = Snake(colors.GREEN, 15, 5, this.screen)
+        this.manager = manager
+        this.snake = Snake(colors.GREEN, 15, 5, this.screen, this.manager)
         #print(this.snake.snakeHead.pos)
     def Update(this):
         #print(this.ID)
