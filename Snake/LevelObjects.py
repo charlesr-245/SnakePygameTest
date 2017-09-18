@@ -5,6 +5,8 @@ import random
 from array import *
 import os
 
+#TODO reset snake direction upon death
+
 class Button(object):
     def __init__(this, _color, _size, fill, text, _colorText, font, _screen, _eventHandler, command, debug = False, background = None):
         this.screen = _screen
@@ -16,10 +18,10 @@ class Button(object):
         text = font.render(text, 1, _colorText, background)
         textInfo = text.get_rect()
         if(debug == True):
-            text2 = font.render(str(size[0]), 1, colors.RED)
-            text3 = font.render(str(size[0]+size[2]), 1, colors.BLUE)
-            text4 = font.render(str(size[1]), 1, colors.GREEN)
-            text5 = font.render(str(size[3]+size[3]), 1, colors.ORANGE)
+            text2 = font.render(str(this.size[0]), 1, colors.RED)
+            text3 = font.render(str(this.size[0]+this.size[2]), 1, colors.BLUE)
+            text4 = font.render(str(this.size[1]), 1, colors.GREEN)
+            text5 = font.render(str(this.size[3]+this.size[3]), 1, colors.ORANGE)
             mousePosX = font.render(str(pygame.mouse.get_pos()[0]),1,colors.RED)
             mousePosY = font.render(str(pygame.mouse.get_pos()[1]),1,colors.BLUE)
             this.screen.blit(text, (this.DISPLAYWIDTH/2-textInfo.center[0], this.DISPLAYHEIGHT/2+textInfo.center[1]/2))
@@ -60,7 +62,9 @@ class Snake(object):
         this.posToAppend = this.pos
         this.snakeHead = SnakeHead(this)
         this.posArray = [array('f'), array('f'), array('f'), array('f')] #Deprecated, used for pos display
-        this.snakeBody = [SnakeBody(this, i) for i in range(1, this.parts)]
+        #this.snakeBody = [SnakeBody(this, i) for i in range(1, this.parts)]
+        this.snakeBody = [SnakeBody(this,i) for i in range(1, this.parts)]
+        #this.snakeBody[6].pos = (100,100,this.size,this.size)
         this.font = pygame.font.Font(None, 50)
     def Update(this, dirX, dirY):
         if (dirX != this.lastDirX or dirY != this.lastDirY):
@@ -94,6 +98,7 @@ class Snake(object):
         this.posArray.clear()
         this.snakeHead.dirX = 1
         this.snakeHead.dirY = 0
+        #print(this.snakeHead.dirX)
         this.lastDirX = 1
         this.lastDirY = 0
         for i in range (1, this.parts-1):
@@ -101,9 +106,9 @@ class Snake(object):
             this.snakeBody[i].dirX = 1
             this.snakeBody[i].dirY = 0
             this.snakeBody[i].posArray = [array('f'), array('f'), array('f'), array('f')]
-            print(this.posArray)
-        print(this.dirX)
-        print(this.dirY)
+            #print(this.posArray)
+        #print(this.dirX)
+        #print(this.dirY)
 
 class SnakeHead(object):
     def __init__(this, snake):
@@ -118,7 +123,6 @@ class SnakeHead(object):
         this.dirY = dirY
         this.pos = (this.pos[0]+(this.speed*dirX), this.pos[1]+(this.speed*dirY), this.size,this.size)
         pygame.draw.rect(this.screen,colors.GREEN,this.pos)
-      
 
 
 class SnakeBody(object):
@@ -129,11 +133,13 @@ class SnakeBody(object):
         this.dirX = snake.dirX
         this.dirY = snake.dirY
         this.speed = snake.speed
-        this.pos = (snake.pos[0]-(i*(this.size+5)),snake.pos[1],this.size,this.size)
+        this.pos = (snake.pos[0]-((i-1)*(this.size+5)),snake.pos[1],this.size,this.size)
         this.font = pygame.font.Font(None,50)
         this.posArray = [array('f'), array('f'), array('f'), array('f')]
         this.manager = snake.manager
+        print(this.part)
     def Update(this, snake):
+        #snake.snakeBody.append(SnakeBody(this,8))
         if (len(this.posArray[0]) != 0):
             if ((this.pos[0] > this.posArray[0][0] - 0.05) and (this.pos[0] < this.posArray[0][0]+0.05)): #Within coordinates' x location
                 if ((this.pos[1] > this.posArray[1][0] - 0.05) and (this.pos[1] < this.posArray[1][0]+0.05)): #Within coordinates' y location
@@ -176,7 +182,15 @@ class SnakeBody(object):
 
 def SendCommand(manager, command, snake):
     if (list(command)[0] == 'l'):
+        snake.ResetPositions()
         manager.previousLevel = 1
         manager.currentLevel = int(list(command)[2])
         #print(manager.currentLevel)
-        snake.ResetPositions()
+
+class Collectable(object):
+    def __init__(this, screen):
+        this.size = 10
+        this.screen = screen
+        this.pos = (random.randint(0,800), random.randint(0,600),this.size,this.size)
+    def Update(this):
+        pygame.draw.rect(this.screen,colors.YELLOW,this.pos)

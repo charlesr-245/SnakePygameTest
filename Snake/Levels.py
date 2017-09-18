@@ -36,6 +36,8 @@ class Level1(object):
         this.eventHandler = eventManager
         this.manager = manager
         this.snake = Snake(colors.GREEN, 15, 5, this.screen, this.manager)
+        this.collectables = [Collectable(this.screen) for i in range(0,20)]
+        print(this.collectables[0].pos)
         #print(this.snake.snakeHead.pos)
     def Update(this):
         #print(this.ID)
