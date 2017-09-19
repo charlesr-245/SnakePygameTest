@@ -58,7 +58,7 @@ class Snake(object):
         this.lastDirY = 0
         this.dirX = 1
         this.dirY = 0
-        this.speed = 0.75
+        this.speed = 5
         this.posToAppend = this.pos
         this.snakeHead = SnakeHead(this)
         this.collectable = collectable
@@ -94,11 +94,12 @@ class Snake(object):
     def AddPart(this):
         this.parts+=1
         this.snakeBody.append(SnakeBody(this,this.parts))
+        print(len(this.snakeBody))
         this.collectable.ResetPos(this.collectable)
 
     def CheckCollectable(this):
-        if (this.snakeHead.pos[0]>= this.collectable.pos[0] - this.collectable.size and this.snakeHead.pos[0]<= this.collectable.pos[0] + this.collectable.size):
-            if (this.snakeHead.pos[1]>= this.collectable.pos[1] - this.collectable.size and this.snakeHead.pos[1]<= this.collectable.pos[1] + this.collectable.size):
+        if (this.snakeHead.pos[0]>= this.collectable.pos[0] - this.collectable.size*2 and this.snakeHead.pos[0]<= this.collectable.pos[0] + this.collectable.size*2):
+            if (this.snakeHead.pos[1]>= this.collectable.pos[1] - this.collectable.size*2 and this.snakeHead.pos[1]<= this.collectable.pos[1] + this.collectable.size*2):
                 this.AddPart()
 
     def ResetPositions(this):
@@ -129,33 +130,43 @@ class SnakeHead(object):
         this.dirX = snake.dirX
         this.dirY = snake.dirY
         this.speed = snake.speed
+        this.parent = snake
     def Update(this,dirX, dirY):
         this.dirX = dirX
         this.dirY = dirY
         this.pos = (this.pos[0]+(this.speed*dirX), this.pos[1]+(this.speed*dirY), this.size,this.size)
         pygame.draw.rect(this.screen,colors.GREEN,this.pos)
+        this.CheckBorders()
+    def CheckBorders(this):
+        if (this.pos[0] - this.size >= 790 or this.pos[0] + this.size <= 0 or this.pos[1] - this.size >= 600 or this.pos[1] <= 0):
+            print("DED")
+            SendCommand(this.parent.manager,"l 0", this.parent)
 
 
 class SnakeBody(object):
-    def __init__(this, snake, i):
+    def __init__(this, snake, i, posArray = None):
         this.part = i
+        if (this.part > 4):
+            this.part-=1
+            #print(len(snake.snakeBody))
         this.size = snake.size
         this.screen = snake.screen
         this.dirX = snake.dirX
         this.dirY = snake.dirY
         this.speed = snake.speed
-        if (snake.snakeHead.dirX != 0):
-            if (this.part > 4):
+        this.posArray = [array('f'), array('f'), array('f'), array('f')]
+        #print(this.part)
+        if (this.part > 4):
+            if (snake.snakeHead.dirX != 0):
                 this.pos = (snake.snakeHead.pos[0]-((i-2)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
             else:
-                this.pos = (snake.snakeHead.pos[0]-((i-1)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
-        else:
-            if (this.part > 4):
                 this.pos = (snake.snakeHead.pos[0],snake.snakeHead.pos[1]-((i-2)*(this.size+5)*snake.snakeHead.dirY),this.size,this.size)
+        else:
+            if (snake.snakeHead.dirX != 0):
+                this.pos = (snake.snakeHead.pos[0]-((i-1)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
             else:
                 this.pos = (snake.snakeHead.pos[0],snake.snakeHead.pos[1]-((i-1)*(this.size+5)*snake.snakeHead.dirY),this.size,this.size)
         this.font = pygame.font.Font(None,50)
-        this.posArray = [array('f'), array('f'), array('f'), array('f')]
         this.manager = snake.manager
         #print(this.part)
     def Update(this, snake):

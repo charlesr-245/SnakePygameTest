@@ -13,7 +13,7 @@ class EventHandler():
        this.mouseDown = False
        for event in pygame.event.get():
             if event.type == QUIT:
-                print("QUITTING PROGRAM...")
+                #print("QUITTING PROGRAM...")
                 sys.exit(0)
             if pygame.mouse.get_pressed()[0]:
                 this.mouseDown = True
