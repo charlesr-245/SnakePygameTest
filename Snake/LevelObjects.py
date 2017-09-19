@@ -58,7 +58,7 @@ class Snake(object):
         this.lastDirY = 0
         this.dirX = 1
         this.dirY = 0
-        this.speed = 0.5
+        this.speed = 0.75
         this.posToAppend = this.pos
         this.snakeHead = SnakeHead(this)
         this.collectable = collectable
@@ -145,20 +145,24 @@ class SnakeBody(object):
         this.dirY = snake.dirY
         this.speed = snake.speed
         if (snake.snakeHead.dirX != 0):
-             this.pos = (snake.snakeHead.pos[0]-((i-1)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
+            if (this.part > 4):
+                this.pos = (snake.snakeHead.pos[0]-((i-2)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
+            else:
+                this.pos = (snake.snakeHead.pos[0]-((i-1)*(this.size+5)*snake.snakeHead.dirX),snake.snakeHead.pos[1],this.size,this.size)
         else:
-             this.pos = (snake.snakeHead.pos[0],snake.snakeHead.pos[1]-((i-1)*(this.size+5)*snake.snakeHead.dirY),this.size,this.size)
+            if (this.part > 4):
+                this.pos = (snake.snakeHead.pos[0],snake.snakeHead.pos[1]-((i-2)*(this.size+5)*snake.snakeHead.dirY),this.size,this.size)
+            else:
+                this.pos = (snake.snakeHead.pos[0],snake.snakeHead.pos[1]-((i-1)*(this.size+5)*snake.snakeHead.dirY),this.size,this.size)
         this.font = pygame.font.Font(None,50)
         this.posArray = [array('f'), array('f'), array('f'), array('f')]
-        if (i > 5):
-            this.posArray = snake.snakeBody[i-1].posArray
         this.manager = snake.manager
         #print(this.part)
     def Update(this, snake):
         #snake.snakeBody.append(SnakeBody(this,8))
         if (len(this.posArray[0]) != 0):
-            if ((this.pos[0] > this.posArray[0][0] - 0.05) and (this.pos[0] < this.posArray[0][0]+0.05)): #Within coordinates' x location
-                if ((this.pos[1] > this.posArray[1][0] - 0.05) and (this.pos[1] < this.posArray[1][0]+0.05)): #Within coordinates' y location
+            if ((this.pos[0] > this.posArray[0][0] - 0.375) and (this.pos[0] < this.posArray[0][0]+0.375)): #Within coordinates' x location
+                if ((this.pos[1] > this.posArray[1][0] - 0.375) and (this.pos[1] < this.posArray[1][0]+0.375)): #Within coordinates' y location
                     #Set the position to the coords for accuracy
                     this.pos = (this.posArray[0][0], this.posArray[1][0],this.size,this.size)
                     #Set the direction to that of when the head changed directions
@@ -189,8 +193,8 @@ class SnakeBody(object):
                 pos2 = str(round(snake.snakeHead.pos[0],3)) + " , " + str(round(snake.snakeHead.pos[1],3)) 
                 text = this.font.render(pos,1, colors.ORANGE)
                 text2 = this.font.render(pos2, 1 , colors.BLUE)
-                this.screen.blit(text, (100,400,0,0))
-                this.screen.blit(text2, (100,500,0,0))
+                #this.screen.blit(text, (100,400,0,0))
+                #this.screen.blit(text2, (100,500,0,0))
         if (this.pos[0] >= snake.snakeHead.pos[0] - 0.5 * this.size  and this.pos[0] <= snake.snakeHead.pos[0] + 0.5 * this.size):
             if (this.pos[1] >= snake.snakeHead.pos[1] - 0.5*this.size and this.pos[1] <= snake.snakeHead.pos[1] + 0.5*this.size):
                 #print("Player hit snake")
@@ -199,6 +203,8 @@ class SnakeBody(object):
 def SendCommand(manager, command, snake):
     if (list(command)[0] == 'l'):
         snake.ResetPositions()
+        manager.eventHandler.xDirection = 1
+        manager.eventHandler.yDirection = 0
         manager.previousLevel = 1
         manager.currentLevel = int(list(command)[2])
         #print(manager.currentLevel)
