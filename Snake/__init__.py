@@ -1,3 +1,8 @@
+'''
+Made by Charles Reverand
+2017
+'''
+
 import pygame
 import sys
 from Display import *
